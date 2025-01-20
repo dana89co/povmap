@@ -66,7 +66,9 @@ data_transformation <- function(fixed,
                                 transformation,
                                 lambda) {
 
-  y_vector <- as.matrix(smp_data[paste(fixed[[2]])])
+  var <- as.character(fixed[[2]])
+
+  y_vector <- as.matrix(smp_data[, ..var])
 
   transformed <- if (transformation == "no") {
     no_transform(y = y_vector, shift = NULL)
@@ -85,9 +87,9 @@ data_transformation <- function(fixed,
   } else if (transformation=="logit") {
     logit_transform(y = y_vector, shift = NULL)
   }
-  
 
-  smp_data[paste(fixed[[2]])] <- transformed$y
+
+  smp_data[, as.character(fixed[[2]])] <- transformed$y
 
   return(list(transformed_data = smp_data, shift = transformed$shift))
 } # End data_transformation
@@ -127,7 +129,7 @@ std_data_transformation <- function(fixed = fixed, smp_data, transformation,
   else if (transformation == "logit") {
     std_transformed <- smp_data[paste(fixed[[2]])]
   }
-  
+
 #  std_transformed <- if (transformation == "box.cox") {
 #    as.data.frame(box_cox_std(y = y_vector, lambda = lambda))
 #  } else if (transformation == "dual") {
@@ -144,7 +146,7 @@ std_data_transformation <- function(fixed = fixed, smp_data, transformation,
 #    smp_data[paste(fixed[[2]])]
 #  } else if (transformation == "logit") {
 #    smp_data[paste(fixed[[2]])]
-#  } 
+#  }
 
   smp_data[paste(fixed[[2]])] <- std_transformed
   return(transformed_data = smp_data)
@@ -173,15 +175,15 @@ back_transformation <- function(y, transformation, lambda, shift,
     ordernorm_back(y = y, shift = shift, framework = framework, fixed = fixed)
   } else if (transformation == "logit") {
     logit_transform_back(y = y, shift = shift)
-  } 
-  
+  }
+
   return(y = back_transformed)
 } # End back_transform
 
 transformation <- function(y, transformation, lambda, shift,
                            framework, fixed) {
-  
-  
+
+
   transformed <- if (transformation == "no") {
     no_transform(y = y)
   } else if (transformation == "log") {
@@ -198,8 +200,8 @@ transformation <- function(y, transformation, lambda, shift,
     ordernorm(y = y, shift = shift)
   } else if (transformation == "logit") {
     logit_transform(y = y, shift = shift)
-  } 
-  
+  }
+
   return(y = transformed)
 } # End transform
 
