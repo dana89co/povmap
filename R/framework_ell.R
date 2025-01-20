@@ -8,7 +8,7 @@
 
 framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, smp_data, smp_domains,
                           smp_subdomains, threshold, custom_indicator = NULL, na.rm,
-                          aggregate_to = NULL, weights, pop_weights, 
+                          aggregate_to = NULL, weights, pop_weights,
                           benchmark_level, benchmark_weights, rescale_weights, errors,random_method,model_parameters, indicators) {
 
 
@@ -26,7 +26,7 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
 
   pop_vars <- c(mod_vars, pop_domains, pop_subdomains, aggregate_to, pop_weights,
                 benchmark_level)
-  smp_data <- smp_data[, smp_vars]
+  smp_data <- smp_data[, ..smp_vars]
   weights <- weights
   pop_weights <- pop_weights
   fw_check1(
@@ -39,18 +39,18 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
   )
 
 
-  pop_data <- pop_data[, pop_vars]
-  # convert to dataframe if necessary 
+  pop_data <- pop_data[, ..pop_vars]
+  # convert to dataframe if necessary
   if ("tbl_df" %in% class(pop_data)) {
     pop_data <- as.data.frame(pop_data)
   }
   if ("tbl_df" %in% class(smp_data)) {
     smp_data <- as.data.frame(smp_data)
   }
-  
-  
-  
-  
+
+
+
+
   # Deletion of NA
   if (na.rm == TRUE) {
     pop_data <- na.omit(pop_data)
@@ -61,11 +61,11 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
                  function ebp."))
   }
 
-  # rescale weights such that mean is equal to one within each domain 
+  # rescale weights such that mean is equal to one within each domain
   if (isTRUE(rescale_weights) && !is.null(weights)) {
     smp_data[,weights] <- smp_data[,weights] / ave(smp_data[,weights], smp_data[,smp_domains])
   }
-  
+
   # Order of domains
   pop_data <- pop_data[order(pop_data[[pop_domains]]), ]
 
@@ -73,7 +73,7 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
   pop_data[[pop_domains]] <- factor(pop_data[[pop_domains]],
                                     levels = levels_tmp)
   pop_domains_vec <- pop_data[[pop_domains]]
-  
+
 
   smp_data[[smp_domains]] <- factor(smp_data[[smp_domains]],
                                     levels = levels_tmp)
@@ -94,17 +94,17 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
 
   smp_domains_vec <- smp_data[[smp_domains]]
   smp_domains_vec <- droplevels(smp_domains_vec)
-  
-  smp_subdomains_vec <- NULL 
-  pop_subdomains_vec <- NULL 
+
+  smp_subdomains_vec <- NULL
+  pop_subdomains_vec <- NULL
   if (!is.null(smp_subdomains) && !is.null(pop_subdomains)) {
     smp_subdomains_vec <- smp_data[[smp_subdomains]]
     smp_subdomains_vec <- droplevels(as.factor(smp_subdomains_vec))
     pop_subdomains_vec <- pop_data[[pop_subdomains]]
   }
-  
-  
-  
+
+
+
 
   fw_check2(
     pop_domains = pop_domains, pop_domains_vec = pop_domains_vec,
@@ -121,7 +121,7 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
   N_unobs <- N_pop - N_smp
   # Number of domains in the population
   N_dom_pop <- length(unique(pop_domains_vec))
-  # Number of subdomains in the population 
+  # Number of subdomains in the population
   N_subdom_pop <- length(unique(pop_subdomains_vec))
   # Number of domains in the population on aggregated level
   N_dom_pop_agg <- length(unique(aggregate_to_vec))
@@ -131,23 +131,23 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
   N_dom_unobs <- N_dom_pop - N_dom_smp
   # Number of households in population per domain
   n_pop <- as.vector(table(pop_domains_vec))
-  # NUmber of households in population per subdomain 
+  # NUmber of households in population per subdomain
   n_pop_subdom <- as.vector(table(pop_subdomains_vec))
   # Number of households in sample per domain
   smp_domains_vec_tmp <- as.numeric(smp_domains_vec)
   n_smp <- as.vector(table(smp_domains_vec_tmp))
   smp_subdomains_vec_tmp <- as.numeric(smp_subdomains_vec)
   n_smp_subdom <- as.vector(table(smp_subdomains_vec_tmp))
-  
-  
-  
+
+
+
   # Indicator variables that indicate if domain is in- or out-of-sample
   obs_dom <- pop_domains_vec %in% unique(smp_domains_vec)
   dist_obs_dom <- unique(pop_domains_vec) %in% unique(smp_domains_vec)
   obs_subdom <- pop_subdomains_vec %in% unique(smp_subdomains_vec)
-  
-  
-  
+
+
+
   fw_check3(
     obs_dom = obs_dom, dist_obs_dom = dist_obs_dom, pop_domains = pop_domains,
     smp_domains = smp_domains
@@ -219,7 +219,7 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
     "Quintile_Share",
     "Quantiles"
   )
-  
+
   if (!is.null(indicators)) {
     keepthese <- which(function_names %in% indicators)
     indicator_list <- indicator_list[keepthese]
@@ -228,7 +228,7 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
     }
     indicator_names <- indicator_names[keepthese]
   }
-  
+
 
   if (!is.null(custom_indicator) && length(custom_indicator) > 0) {
     for(i in 1:length(custom_indicator)) {
@@ -251,11 +251,11 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
   return(list(
     pop_data = pop_data,
     pop_domains_vec = pop_domains_vec,
-    pop_subdomains = pop_subdomains, 
+    pop_subdomains = pop_subdomains,
     smp_data = smp_data,
     smp_domains_vec = smp_domains_vec,
     smp_domains = smp_domains,
-    smp_subdomains = smp_subdomains, 
+    smp_subdomains = smp_subdomains,
     aggregate_to = aggregate_to,
     aggregate_to_vec = aggregate_to_vec,
     N_pop = N_pop,
@@ -263,14 +263,14 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
     N_unobs = N_unobs,
     N_dom_pop = N_dom_pop,
     N_dom_pop_agg = N_dom_pop_agg,
-    N_subdom_pop = N_subdom_pop, 
+    N_subdom_pop = N_subdom_pop,
     N_dom_smp = N_dom_smp,
     N_dom_unobs = N_dom_unobs,
     n_pop = n_pop,
     n_smp = n_smp,
-    n_pop_subdom = n_pop_subdom, 
+    n_pop_subdom = n_pop_subdom,
     obs_dom = obs_dom,
-    obs_subdom = obs_subdom, 
+    obs_subdom = obs_subdom,
     dist_obs_dom = dist_obs_dom,
     indicator_list = indicator_list,
     indicator_names = indicator_names,
@@ -279,8 +279,8 @@ framework_ell <- function(fixed, alpha, pop_data, pop_domains, pop_subdomains, s
     benchmark_weights = benchmark_weights,
     pop_weights = pop_weights,
     errors=errors,
-    random_method=random_method, 
-    model_parameters=model_parameters 
+    random_method=random_method,
+    model_parameters=model_parameters
   ))
 }
 
