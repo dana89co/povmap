@@ -1,19 +1,19 @@
-#' Prediction for Disaggregated Indicators Using ELL 
+#' Prediction for Disaggregated Indicators Using ELL
 #'
 #' Function \code{ebp} estimates indicators using the
 #' approach by \cite{Elbers, Lanjouw, and Lanjouw (2010)}. Point predictions of indicators
-#' are obtained by Monte-Carlo approximations based on an unconditional random effect 
-#' model. Additionally, variance is estimated treating parameters as uncertain. 
+#' are obtained by Monte-Carlo approximations based on an unconditional random effect
+#' model. Additionally, variance is estimated treating parameters as uncertain.
 #' As in EBP, five different transformation types for the dependent variable can be chosen.
 #' This approach can be extended to data under informative sampling using
 #' weights and is based on \cite{Guadarrama et al. (2018)}.
 #'
 #' @param fixed a two-sided linear formula object describing the
-#' linear regression model with the dependent variable on the left of a ~ operator 
+#' linear regression model with the dependent variable on the left of a ~ operator
 #' and the explanatory variables on the right, separated by + operators. The argument corresponds
 #' to the argument \code{fixed} in function \code{\link[nlme]{lme}}.
-#' @param alpha a one-sides linear formula describing the independent variables used to predict 
-#' variance in the "alpha" model 
+#' @param alpha a one-sides linear formula describing the independent variables used to predict
+#' variance in the "alpha" model
 #' @param pop_data a data frame that needs to comprise the variables
 #' named on the right of the ~ operator in \code{fixed}, i.e. the explanatory
 #' variables, and \code{pop_domains}.
@@ -21,8 +21,8 @@
 #' indicates domains in the population data. The variable can be numeric or
 #' a factor but needs to be of the same class as the variable named in
 #' \code{smp_domains}.
-#' @param pop_subdomains a character string containing the name of a variable that 
-#' indicates sub-domains in the population data. When this option is specified, a 
+#' @param pop_subdomains a character string containing the name of a variable that
+#' indicates sub-domains in the population data. When this option is specified, a
 #' two-fold nested error model is used. Defaults to \code{NULL}
 #' @param smp_data a data frame that needs to comprise all variables named in
 #' \code{fixed} and \code{smp_domains}.
@@ -30,8 +30,8 @@
 #' that indicates domains in the sample data. The variable can be numeric or a
 #' factor but needs to be of the same class as the variable named in
 #' \code{pop_domains}.
-#' #' @param smp_subdomains a character string containing the name of a variable that 
-#' indicates sub-domains in the sample data. When this option is specified, a 
+#' #' @param smp_subdomains a character string containing the name of a variable that
+#' indicates sub-domains in the sample data. When this option is specified, a
 #' two-fold nested error model is used. Defaults to \code{NULL}
 #' @param threshold a number defining a threshold. Alternatively, a threshold
 #' may be defined as a \code{function} of \code{y} returning a numeric value.
@@ -59,7 +59,7 @@
 #' distributions, the negative values may be excluded, also values larger than
 #' 1 are seldom observed.
 #' @param L a number determining the number of Monte-Carlo simulations that
-#' must be at least 1. Defaults to 100. 
+#' must be at least 1. Defaults to 100.
 #' @param seed an integer to set the seed for the random number generator. For
 #' the usage of random number generation, see Details. If seed is set to
 #' \code{NULL}, seed is chosen randomly. Defaults to \code{123}.
@@ -126,20 +126,20 @@
 #' @param Ydump a string specifying the name of a .csv file to save all simulated
 #' values of the dependent value, model predictions, and error terms used for
 #' point estimation.
-#' @param errors a string containing either "normal" or "nonnormal". If normal, error terms 
-#' are drawn from a normal distribution. If non-normal, error terms are drawn via a 
-#' non-parametric bootstrap. 
+#' @param errors a string containing either "normal" or "nonnormal". If normal, error terms
+#' are drawn from a normal distribution. If non-normal, error terms are drawn via a
+#' non-parametric bootstrap.
 #' @param model_parameters a string specifying "fixed" or "variable". If variable is specified,
-#' estimates of model parameters beta and sigma will be drawn from their estimated 
-#' distribution. Otherwise they are assumed fixed. Defaults to "variable".  
-#' @param indicators a list of strings containing outcome indicators that should be calculated. 
-#' Defaults to NULL, which selects all indicators.  
+#' estimates of model parameters beta and sigma will be drawn from their estimated
+#' distribution. Otherwise they are assumed fixed. Defaults to "variable".
+#' @param indicators a list of strings containing outcome indicators that should be calculated.
+#' Defaults to NULL, which selects all indicators.
 #' @return An object of class "ell", "emdi" that provides estimators for
 #' regional disaggregated indicators.
 #' Several generic functions have methods for the returned object. For a full
 #' list and descriptions of the components of objects of class "emdi",
 #' see \code{\link{emdiObject}}.
-#' @details For Monte-Carlo approximationsrandom number generation is used. 
+#' @details For Monte-Carlo approximationsrandom number generation is used.
 #' Thus, a seed is set by the
 #' argument \code{seed}. \cr \cr
 #' The set of predefined indicators includes the mean, median, four further
@@ -154,13 +154,13 @@
 #' @export
 
 ell <- function(fixed,
-                alpha = NULL, 
+                alpha = NULL,
                 pop_data,
                 pop_domains,
-                pop_subdomains = NULL, 
+                pop_subdomains = NULL,
                 smp_data,
                 smp_domains,
-                smp_subdomains = NULL, 
+                smp_subdomains = NULL,
                 L = 100,
                 threshold = NULL,
                 transformation = "log.shift",
@@ -169,7 +169,7 @@ ell <- function(fixed,
                 custom_indicator = NULL,
                 na.rm = FALSE,
                 weights = NULL,
-                weights_type = NULL, 
+                weights_type = NULL,
                 pop_weights = NULL,
                 aggregate_to = NULL,
                 benchmark = NULL,
@@ -177,37 +177,38 @@ ell <- function(fixed,
                 benchmark_level = NULL,
                 benchmark_weights = NULL,
                 rescale_weights = FALSE,
-                random_method = NULL, 
-                Ydump = NULL, 
+                random_method = NULL,
+                Ydump = NULL,
                 errors = "normal",
-                model_parameters = "variable", 
+                model_parameters = "variable",
                 indicators = NULL
 ) {
-  
+
   start.time <- Sys.time()
   ebp_check1(
     fixed = fixed, pop_data = pop_data, pop_domains = pop_domains,
     smp_data = smp_data, smp_domains = smp_domains, L = L
   )
-  
-  
+
+
   ebp_check2(
     threshold = threshold, transformation = transformation,
-    interval = interval, MSE = F, boot_type = "parametric", B = 50, L= L, 
+    interval = interval, MSE = F, boot_type = "parametric", B = 50, L= L,
     custom_indicator = custom_indicator, cpus = 1, seed = seed,
     na.rm = na.rm, weights = weights, pop_weights = pop_weights,
     weights_type = weights_type, benchmark = benchmark,
     benchmark_type = benchmark_type, benchmark_level = benchmark_level,
-    benchmark_weights = benchmark_weights,MSE_pop_weights=NULL 
+    benchmark_weights = benchmark_weights,MSE_pop_weights=NULL,
+    smp_subdomains = smp_subdomains, pop_subdomains=pop_subdomains
   )
-  
+
   if (!is.null(alpha) & transformation!="log" & transformation!="log.shift") {
     stop(strwrap(prefix = " ", initial = "",
                  "Must use log or log shift transformation when using alpha model."))
   }
-  
+
   # Save function call ---------------------------------------------------------
-  
+
   call <- match.call()
   if (inherits(call$fixed, "name")) {
     call$fixed <- fixed
@@ -218,19 +219,19 @@ ell <- function(fixed,
   if (is.null(benchmark_weights) & !is.null(weights)) {
     benchmark_weights <- weights
   }
-  
+
   # The function framework_ell can be found in script framework_ell.R
   framework <- framework_ell(
     pop_data = pop_data,
     pop_domains = pop_domains,
-    pop_subdomains = pop_subdomains, 
+    pop_subdomains = pop_subdomains,
     smp_data = smp_data,
     smp_domains = smp_domains,
-    smp_subdomains = smp_subdomains, 
+    smp_subdomains = smp_subdomains,
     aggregate_to = aggregate_to,
     custom_indicator = custom_indicator,
     fixed = fixed,
-    alpha = alpha, 
+    alpha = alpha,
     threshold = threshold,
     na.rm = na.rm,
     weights = weights,
@@ -240,27 +241,27 @@ ell <- function(fixed,
     rescale_weights = rescale_weights,
     errors = errors,
     indicators = indicators,
-    random_method = random_method, 
+    random_method = random_method,
     model_parameters = model_parameters
   )
-  
-  
-  
+
+
+
   # Point Estimation -----------------------------------------------------------
   # The function point_estim can be found in script point_estimation.R
   point_estim <- point_estim_ell(
     framework = framework,
     fixed = fixed,
-    alpha = alpha, 
+    alpha = alpha,
     transformation = transformation,
     interval = interval,
     L = L,
     keep_data = TRUE,
     Ydump = Ydump
   )
-  
-  
-  
+
+
+
   # benchmarking
   if (!is.null(benchmark)) {
     if (is.null(benchmark_level)) {
@@ -279,7 +280,7 @@ ell <- function(fixed,
         benchmark_type = benchmark_type,
         benchmark_level = benchmark_level)
     }
-    
+
     if (any(names(point_estim$ind) %in% c("Mean_bench"))) {
       if (any(is.na(point_estim$ind$Mean_bench))) {
         message(strwrap(prefix = " ", initial = "",
@@ -287,7 +288,7 @@ ell <- function(fixed,
                           Mean contain missing values. Please check source data"))
       }
     }
-    
+
     if (any(names(point_estim$ind) %in% c("Head_Count_bench"))) {
       if (any(is.na(point_estim$ind$Head_Count_bench))) {
         message(strwrap(prefix = " ", initial = "",
@@ -302,9 +303,9 @@ ell <- function(fixed,
       }
     }
   }
-  
-  
-  
+
+
+
 
     ell_out <- list(
       ind = point_estim$ind,
@@ -314,7 +315,7 @@ ell <- function(fixed,
         "shift_par"
       )],
       model = point_estim$model,
-      alpha_model = point_estim$alpha_model, 
+      alpha_model = point_estim$alpha_model,
       model_par = point_estim$model_par,
       framework = framework[c(
         "N_dom_unobs",
@@ -332,17 +333,17 @@ ell <- function(fixed,
       transformation = transformation,
       method = "reml",
       fixed = fixed,
-      alpha = alpha, 
+      alpha = alpha,
       call = call,
       successful_bootstraps = NULL
     )
-  
-  
-  
+
+
+
   end.time <- Sys.time()
   print(round(end.time - start.time,2))
-  
-  
+
+
   class(ell_out) <- c("ell","povmap")
   return(ell_out)
 }
