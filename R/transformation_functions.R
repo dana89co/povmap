@@ -103,7 +103,7 @@ data_transformation <- function(fixed,
 std_data_transformation <- function(fixed = fixed, smp_data, transformation,
                                     lambda) {
 
-  y_vector <- as.matrix(smp_data[paste(fixed[[2]])])
+  y_vector <- as.matrix(smp_data[[as.character(fixed[2])]])
 
   if (transformation == "box.cox") {
     std_transformed <-  as.data.frame(box_cox_std(y = y_vector, lambda = lambda))
@@ -148,7 +148,7 @@ std_data_transformation <- function(fixed = fixed, smp_data, transformation,
 #    smp_data[paste(fixed[[2]])]
 #  }
 
-  smp_data[paste(fixed[[2]])] <- std_transformed
+  smp_data[[as.character(fixed[2])]] <- std_transformed
   return(transformed_data = smp_data)
 } # End std_data_transformation
 
@@ -454,7 +454,7 @@ ordernorm <- function(y, shift = NULL) {
 
 ordernorm_back <- function(y, shift = NULL, framework, fixed){
 
-  orderNorm_obj <- orderNorm(x = framework$smp_data[,paste(fixed[[2]])],
+  orderNorm_obj <- orderNorm(x = framework$smp_data[[as.character(fixed[2])]],
                              warn = FALSE)
 
   y <- inv_orderNorm_trans(orderNorm_obj = orderNorm_obj, new_points_x_t = y,

@@ -18,7 +18,7 @@ if (transformation != "no" && transformation != "log" &&
     } else if (transformation == "log.shift" && any(interval == "default")) {
       # interval = c(min(smp_data[paste(fixed[2])]),
       # max(smp_data[paste(fixed[2])]))
-      span <- range(smp_data[paste(fixed[2])])
+      span <- range(smp_data[[as.character(fixed[2])]])
       if ((span[1] + 1) <= 1) {
         lower <- abs(span[1]) + 1
       } else {
@@ -33,7 +33,7 @@ if (transformation != "no" && transformation != "log" &&
     # Estimation of optimal lambda parameters
 
   if (!is.null(framework$nlme_method)) {
-    #EBP 
+    #EBP
       optimal_parameter <- optimize(generic_opt,
       fixed          = fixed,
       smp_data       = smp_data,
@@ -44,7 +44,7 @@ if (transformation != "no" && transformation != "log" &&
       maximum        = FALSE
     )$minimum
   } else {
-    #ELL 
+    #ELL
   optimal_parameter <- optimize(generic_opt_ell,
       fixed          = fixed,
       smp_data       = smp_data,
@@ -54,7 +54,7 @@ if (transformation != "no" && transformation != "log" &&
       framework      = framework,
       maximum        = FALSE
   )$minimum
-        } 
+        }
   }
   else {
     optimal_parameter <- NULL
@@ -99,7 +99,7 @@ generic_opt_ell <- function(lambda,
                         smp_domains,
                         transformation,
                         framework) {
-  
+
   # Definition of optimization function for finding the optimal lambda
   # Preperation to easily implement further methods here
   optimization <- if (TRUE) {
@@ -149,10 +149,10 @@ reml <- function(fixed = fixed,
         control = nlme::lmeControl(maxIter = framework$nlme_maxiter,
                                    tolerance = framework$nlme_tolerance,
                                    opt = framework$nlme_opt,
-                                   optimMethod = framework$nlme_optimmethod, 
+                                   optimMethod = framework$nlme_optimmethod,
                                    msMaxIter=framework$nlme_msmaxiter,
                                    msTol=framework$nlme_mstol,
-                                   returnObject = framework$nlme_returnobject 
+                                   returnObject = framework$nlme_returnobject
         ),
         keep.data = FALSE,
         weights =
@@ -170,10 +170,10 @@ reml <- function(fixed = fixed,
         control = nlme::lmeControl(maxIter = framework$nlme_maxiter,
                                    tolerance = framework$nlme_tolerance,
                                    opt = framework$nlme_opt,
-                                   optimMethod = framework$nlme_optimmethod, 
+                                   optimMethod = framework$nlme_optimmethod,
                                    msMaxIter=framework$nlme_msmaxiter,
                                    msTol=framework$nlme_mstol,
-                                   returnObject = framework$nlme_returnobject 
+                                   returnObject = framework$nlme_returnobject
         ),
         keep.data = FALSE
       )
@@ -182,7 +182,7 @@ reml <- function(fixed = fixed,
   if (is.null(model_REML)) {
     stop(strwrap(prefix = " ", initial = "",
                  "The likelihood did not converge when estimating an nlme model to select the optimal
-                 transformation parameter. Try adjusting nlme_opt, nlme_maxiter, nlme_tolerance, 
+                 transformation parameter. Try adjusting nlme_opt, nlme_maxiter, nlme_tolerance,
                  nlme_optimmethod, or nlme_returnobject when calling ebp, or using a non-adapative transformation. See also
                  help(ebp)."))
   } else {
@@ -201,7 +201,7 @@ ml_plm <- function(fixed = fixed,
                  transformation = transformation,
                  lambda = lambda,
                  framework = framework) {
-  
+
   sd_transformed_data <- std_data_transformation(
     fixed = fixed,
     smp_data = smp_data,
@@ -209,20 +209,20 @@ ml_plm <- function(fixed = fixed,
       transformation,
     lambda = lambda
   )
-  
+
   model_PLM <- NULL
   weights_arg <- NULL
   if (!is.null(framework$weight)) {
     weights_arg <- framework$smp_data[,framework$weights]
 }
 
-  args <- list(formula=fixed, 
-               data = sd_transformed_data, 
+  args <- list(formula=fixed,
+               data = sd_transformed_data,
                weights = weights_arg ,
                model="random",
                index = framework$smp_domains,
                random.method=framework$random_method)
-  
+
   try(
     model_PLM <- do.call(plm:::plm, args)
 , silent = TRUE)
@@ -245,7 +245,7 @@ ml_plm <- function(fixed = fixed,
     e2=object$residuals^2
     tosum <- cbind(e2,rep(1,nobs(object)),e)
     group <- plm:::index.panelmodel(object)
-    sum <- aggregate(tosum,by=list(group[,1]),FUN=sum) 
+    sum <- aggregate(tosum,by=list(group[,1]),FUN=sum)
     s2e <- object$ercomp$sigma2[1]
     s2u <- object$ercomp$sigma2[2]
     Ti <- sum[,3]
@@ -256,4 +256,3 @@ ml_plm <- function(fixed = fixed,
     attr(ll,"nobs") <- plm::nobs(object)
     return(ll)
   }
-  
